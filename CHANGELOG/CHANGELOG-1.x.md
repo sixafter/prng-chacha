@@ -12,11 +12,22 @@ Date format: `YYYY-MM-DD`
 
 ### Added
 ### Changed
-- **defect:** Move OpenSSF Scorecard badge to Quality section of [README.md](../README.md).
-
 ### Deprecated
 ### Removed
 ### Fixed
+
+---
+
+## [1.0.1] - 2025-07-18
+
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- **defect:** Corrected CHANGELOG.
+
+### Security
 
 ---
 
@@ -31,7 +42,8 @@ Date format: `YYYY-MM-DD`
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/sixafter/prng-chacha/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/sixafter/prng-chacha/compare/fa8c7dece7bdfb898d191752cdf6f5b885d43c5b...v1.0.0
 
 [MUST]: https://datatracker.ietf.org/doc/html/rfc2119
