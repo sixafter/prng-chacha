@@ -18,6 +18,19 @@ Date format: `YYYY-MM-DD`
 
 ---
 
+## [1.2.0] - 2025-08-13
+
+### Added
+### Changed
+- **debt:** Updated to Go 1.25 to leverage the latest language features and performance improvements.
+
+### Deprecated
+### Removed
+### Fixed
+### Security
+
+---
+
 ## [1.0.1] - 2025-07-18
 
 ### Added
@@ -42,7 +55,8 @@ Date format: `YYYY-MM-DD`
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/sixafter/prng-chacha/compare/v1.0.1...v1.2.0
 [1.0.1]: https://github.com/sixafter/prng-chacha/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/sixafter/prng-chacha/compare/fa8c7dece7bdfb898d191752cdf6f5b885d43c5b...v1.0.0
 
