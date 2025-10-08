@@ -439,3 +439,21 @@ func Test_PRNG_Reader_Config(t *testing.T) {
 	// All fields must match (deep comparison)
 	is.Equal(want, got, "Config() should return the config passed to NewReader")
 }
+
+// Test_PRNG_NewReader_InitFailure ensures NewReader returns a clean error
+// (and does not panic) when PRNG initialization cannot succeed because MaxInitRetries
+// is configured to 0. This exercises the non-panic path without test-only hooks.
+func Test_PRNG_NewReader_InitFailure(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	// Set MaxInitRetries to 0 so the initialization loop performs zero attempts
+	// and the pool.New returns nil. Use a single shard to keep the test simple.
+	rdr, err := NewReader(
+		WithShards(1),
+		WithMaxInitRetries(0),
+	)
+
+	is.Error(err, "NewReader should return an error when initialization can't succeed")
+	is.Nil(rdr, "Reader should be nil when initialization fails")
+}

@@ -22,17 +22,17 @@ func benchConcurrent(b *testing.B, fn func(), goroutines int) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < goroutines; i++ {
-		iters := nPerG
+		it := nPerG
 		if i < rem {
-			iters++
+			it++
 		}
 		wg.Add(1)
-		go func(iters int) {
+		go func(it int) {
 			defer wg.Done()
-			for j := 0; j < iters; j++ {
+			for j := 0; j < it; j++ {
 				fn()
 			}
-		}(iters)
+		}(it)
 	}
 	wg.Wait()
 }
