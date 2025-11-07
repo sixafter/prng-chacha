@@ -60,7 +60,7 @@ To verify the integrity of the release tarball, you can use Cosign to check the 
 # Fetch the latest release tag from GitHub API (e.g., "v1.9.0")
 TAG=$(curl -s https://api.github.com/repos/sixafter/prng-chacha/releases/latest | jq -r .tag_name)
 
-# Remove leading "v" for filenames (e.g., "v1.0.0" -> "1.9.0")
+# Remove leading "v" for filenames (e.g., "v1.9.0" -> "1.9.0")
 VERSION=${TAG#v}
 
 # ---------------------------------------------------------------------
