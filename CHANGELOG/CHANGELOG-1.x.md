@@ -15,6 +15,8 @@ Date format: `YYYY-MM-DD`
 ### Deprecated
 ### Removed
 ### Fixed
+- **defect:** Fixed verify-signature make target to use correct project name.
+
 ### Security
 
 ---

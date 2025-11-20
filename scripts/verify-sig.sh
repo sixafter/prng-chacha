@@ -18,7 +18,7 @@ fi
 # ------------------------------------------------------------
 # Project / repository name (portable)
 # ------------------------------------------------------------
-PROJECT="aes-ctr-drbg"
+PROJECT="prng-chacha"
 REPO="sixafter/${PROJECT}"
 MODULE="github.com/${REPO}"
 
