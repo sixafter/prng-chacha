@@ -18,6 +18,7 @@ Date format: `YYYY-MM-DD`
 - **defect:** Fixed verify-signature make target to use correct project name.
 
 ### Security
+- **risk:** Go module verification accepts a specific version of Go for checksum verification.
 
 ---
 
