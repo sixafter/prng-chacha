@@ -15,6 +15,17 @@ Date format: `YYYY-MM-DD`
 ### Deprecated
 ### Removed
 ### Fixed
+### Security
+
+---
+
+## [1.10.1] - 2025-11-21
+
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
 - **defect:** Fixed verify-signature make target to use correct project name.
 
 ### Security
@@ -172,7 +183,8 @@ Date format: `YYYY-MM-DD`
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.10.0...HEAD
+[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.10.1...HEAD
+[1.10.1]: https://github.com/sixafter/prng-chacha/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/sixafter/prng-chacha/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/sixafter/prng-chacha/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/sixafter/prng-chacha/compare/v1.7.0...v1.8.0
