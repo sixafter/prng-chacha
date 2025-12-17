@@ -12,6 +12,8 @@ Date format: `YYYY-MM-DD`
 
 ### Added
 ### Changed
+- **debt:** Upgraded all dependencies to their latest stable versions.
+
 ### Deprecated
 ### Removed
 ### Fixed
@@ -29,6 +31,21 @@ Date format: `YYYY-MM-DD`
 ### Removed
 ### Fixed
 ### Security
+
+---
+
+## [1.10.1] - 2025-11-21
+
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- **defect:** Fixed verify-signature make target to use correct project name.
+
+### Security
+- **risk:** Go module verification accepts a specific version of Go for checksum verification.
+
 
 ---
 
