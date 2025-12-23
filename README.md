@@ -133,7 +133,7 @@ package main
 import (
   "fmt"
   
-  "github.com/sixafter/sixafter/prng-chacha"
+  "github.com/sixafter/prng-chacha"
 )
 
 func main() {
@@ -155,7 +155,7 @@ import (
   "fmt"
 
   "github.com/google/uuid"
-  "github.com/sixafter/sixafter/prng-chacha"
+  "github.com/sixafter/prng-chacha"
 )
 
 func main() {
