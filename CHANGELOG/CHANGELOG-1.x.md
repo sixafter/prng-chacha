@@ -12,8 +12,20 @@ Date format: `YYYY-MM-DD`
 
 ### Added
 ### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+
+---
+
+## [1.12.0] - 2025-12-29
+
+### Added
+### Changed
 - **debt:** Upgraded all dependencies to their latest stable versions.
 - **risk:** Add retry logic to signature verification make target to handle transient network errors.
+- **debt:** `WithShards` now normalizes zero or negative values to `runtime.GOMAXPROCS(0)`.
 
 ### Deprecated
 ### Removed
@@ -214,7 +226,8 @@ Date format: `YYYY-MM-DD`
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.11.0...HEAD
+[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.12.0...HEAD
+[1.12.0]: https://github.com/sixafter/prng-chacha/compare/v1.11.0...v1.12.0
 [1.11.0]: https://github.com/sixafter/prng-chacha/compare/v1.10.1...v1.11.0
 [1.10.1]: https://github.com/sixafter/prng-chacha/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/sixafter/prng-chacha/compare/v1.9.0...v1.10.0

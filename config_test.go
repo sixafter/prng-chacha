@@ -11,6 +11,7 @@
 package prng
 
 import (
+	"runtime"
 	"testing"
 	"time"
 
@@ -170,6 +171,28 @@ func TestConfig_WithShards(t *testing.T) {
 	cfg := DefaultConfig()
 	WithShards(8)(&cfg)
 	is.Equal(8, cfg.Shards, "WithShards should override Shards")
+}
+
+// TestConfig_WithShards_Normalization ensures that WithShards normalizes
+// zero and negative values to runtime.GOMAXPROCS(0).
+func TestConfig_WithShards_Normalization(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	// Test zero normalization
+	cfg := DefaultConfig()
+	WithShards(0)(&cfg)
+	is.Equal(runtime.GOMAXPROCS(0), cfg.Shards, "WithShards(0) should normalize to GOMAXPROCS(0)")
+
+	// Test negative normalization
+	cfg = DefaultConfig()
+	WithShards(-5)(&cfg)
+	is.Equal(runtime.GOMAXPROCS(0), cfg.Shards, "WithShards(-5) should normalize to GOMAXPROCS(0)")
+
+	// Test positive value preserved
+	cfg = DefaultConfig()
+	WithShards(8)(&cfg)
+	is.Equal(8, cfg.Shards, "WithShards(8) should preserve explicit positive value")
 }
 
 // TestConfig_AllOptions verifies that all option functions can be composed
