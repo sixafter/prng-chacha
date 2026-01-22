@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Six After, Inc
+// Copyright (c) 2024-2026 Six After, Inc
 //
 // This source code is licensed under the Apache 2.0 License found in the
 // LICENSE file in the root directory of this source tree.
@@ -13,8 +13,6 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
-
-	"golang.org/x/crypto/chacha20"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -290,49 +288,29 @@ func Test_PRNG_ReadConsistency(t *testing.T) {
 	}
 }
 
-// Test_PRNG_AsyncRekey validates the asynchronous rekeying mechanism of the PRNG implementation.
-// It configures a low MaxBytesPerKey to force rekeying, writes enough data to trigger it,
-// and then checks that a new cipher is used and usage counter is reset, all within a timeout.
-func Test_PRNG_AsyncRekey(t *testing.T) {
+// Test_PRNG_RekeyMechanism validates that exceeding the threshold
+// sets the rekey flag. The actual async rekey completion is tested
+// by Test_PRNG_KeyRotationTracking which measures rotations over time.
+func Test_PRNG_RekeyMechanism(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
 	cfg := DefaultConfig()
-	cfg.MaxBytesPerKey = 64                  // small threshold to trigger rekey
-	cfg.RekeyBackoff = 10 * time.Millisecond // speed up test execution
-	cfg.MaxRekeyAttempts = 3
-	cfg.MaxInitRetries = 3
+	cfg.MaxBytesPerKey = 64
 	cfg.EnableKeyRotation = true
+	cfg.MaxRekeyAttempts = 3
 
-	p, err := newPRNG(&cfg)
-	is.NoError(err, "newPRNG should not error")
+	p, err := newPRNG(&cfg, &atomic.Uint64{})
+	is.NoError(err)
 
-	initialCipher := p.cipher.Load().(*chacha20.Cipher)
-
-	// Write a large enough buffer to exceed MaxBytesPerKey and trigger rekey
+	// Exceed threshold to trigger rekey flag
 	buf := make([]byte, 128)
 	_, err = p.Read(buf)
 	is.NoError(err)
 
-	// Wait up to 500ms for the async rekey to complete
-	wait := time.NewTimer(500 * time.Millisecond)
-	tick := time.NewTicker(10 * time.Millisecond)
-	defer wait.Stop()
-	defer tick.Stop()
-
-	for {
-		select {
-		case <-tick.C:
-			// Check if cipher was replaced and usage reset
-			currentCipher := p.cipher.Load().(*chacha20.Cipher)
-			currentUsage := atomic.LoadUint64(&p.usage)
-			if currentCipher != initialCipher && currentUsage == 0 {
-				return // success
-			}
-		case <-wait.C:
-			t.Fatal("Timed out waiting for asyncRekey to complete")
-		}
-	}
+	// Verify flag was set (this is synchronous and deterministic)
+	is.Equal(uint32(1), atomic.LoadUint32(&p.rekeying))
+	is.Equal(uint64(128), atomic.LoadUint64(&p.usage))
 }
 
 // Test_PRNG_Read_Shards verifies that a single call to Read only accesses
@@ -373,7 +351,7 @@ func Test_PRNG_Read_Shards(t *testing.T) {
 						// Record that this shard was used.
 						hit[id] = true
 						cfg := DefaultConfig()
-						d, _ := newPRNG(&cfg)
+						d, _ := newPRNG(&cfg, &atomic.Uint64{})
 						return d
 					},
 				}
@@ -456,4 +434,168 @@ func Test_PRNG_NewReader_InitFailure(t *testing.T) {
 
 	is.Error(err, "NewReader should return an error when initialization can't succeed")
 	is.Nil(rdr, "Reader should be nil when initialization fails")
+}
+
+// Test_PRNG_NewReader_ValidationErrors verifies that NewReader returns
+// appropriate errors for invalid configuration values.
+func Test_PRNG_NewReader_ValidationErrors(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name    string
+		opts    []Option
+		wantErr error
+	}{
+		{
+			name:    "ZeroMaxBytesPerKey",
+			opts:    []Option{WithMaxBytesPerKey(0)},
+			wantErr: ErrMaxBytesPerKeyZero,
+		},
+		{
+			name:    "NegativeMaxInitRetries",
+			opts:    []Option{WithMaxInitRetries(-1)},
+			wantErr: ErrMaxInitRetriesNegative,
+		},
+		{
+			name:    "NegativeMaxRekeyAttempts",
+			opts:    []Option{WithMaxRekeyAttempts(-5)},
+			wantErr: ErrMaxRekeyAttemptsNegative,
+		},
+		{
+			name:    "NegativeDefaultBufferSize",
+			opts:    []Option{WithDefaultBufferSize(-100)},
+			wantErr: ErrDefaultBufferSizeNegative,
+		},
+		{
+			name:    "NegativeRekeyBackoff",
+			opts:    []Option{WithRekeyBackoff(-1 * time.Second)},
+			wantErr: ErrRekeyBackoffNegative,
+		},
+		{
+			name:    "NegativeMaxRekeyBackoff",
+			opts:    []Option{WithMaxRekeyBackoff(-2 * time.Second)},
+			wantErr: ErrMaxRekeyBackoffNegative,
+		},
+		{
+			name: "MaxRekeyBackoffLessThanRekeyBackoff",
+			opts: []Option{
+				WithRekeyBackoff(5 * time.Second),
+				WithMaxRekeyBackoff(2 * time.Second),
+			},
+			wantErr: ErrMaxRekeyBackoffTooSmall,
+		}}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			is := assert.New(t)
+
+			rdr, err := NewReader(tc.opts...)
+			is.ErrorIs(err, tc.wantErr, "Expected specific error for invalid config")
+			is.Nil(rdr, "Reader should be nil when validation fails")
+		})
+	}
+}
+
+// Test_PRNG_KeyRotationTracking verifies that the reader-level key rotation
+// counter is incremented correctly across multiple rekeying events and that
+// the counter is shared across all shards.
+func Test_PRNG_KeyRotationTracking(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	// Configure aggressive rotation to force multiple rekeys quickly
+	cfg := DefaultConfig()
+	cfg.MaxBytesPerKey = 32 // Very low threshold to trigger frequent rekeys
+	cfg.RekeyBackoff = 5 * time.Millisecond
+	cfg.MaxRekeyBackoff = 10 * time.Millisecond
+	cfg.MaxRekeyAttempts = 5
+	cfg.EnableKeyRotation = true
+	cfg.Shards = 2 // Multiple shards to verify counter is shared
+
+	r, err := NewReader(
+		WithMaxBytesPerKey(cfg.MaxBytesPerKey),
+		WithRekeyBackoff(cfg.RekeyBackoff),
+		WithMaxRekeyBackoff(cfg.MaxRekeyBackoff),
+		WithMaxRekeyAttempts(cfg.MaxRekeyAttempts),
+		WithEnableKeyRotation(cfg.EnableKeyRotation),
+		WithShards(cfg.Shards),
+	)
+	is.NoError(err)
+
+	// Initial state: no rotations should have occurred yet
+	stats := r.(*reader).Stats()
+	is.Equal(uint64(0), stats.KeyRotations, "Initial rotation count should be 0")
+
+	// Generate enough data across multiple shards to trigger several rekeys
+	const numReads = 20
+	const readSize = 64 // Each read exceeds MaxBytesPerKey (32)
+	buf := make([]byte, readSize)
+
+	for i := 0; i < numReads; i++ {
+		_, err := r.Read(buf)
+		is.NoError(err, "Read %d should succeed", i)
+	}
+
+	// Wait for async rekeys to complete (generous timeout)
+	time.Sleep(500 * time.Millisecond)
+
+	// Verify that key rotations occurred
+	stats = r.(*reader).Stats()
+	is.Greater(stats.KeyRotations, uint64(0), "KeyRotations should be > 0 after heavy usage")
+
+	// Verify bytes generated counter is also tracking correctly
+	expectedMinBytes := uint64(numReads * readSize)
+	is.GreaterOrEqual(stats.BytesGenerated, expectedMinBytes, "BytesGenerated should track all reads")
+
+	t.Logf("After %d reads of %d bytes each:", numReads, readSize)
+	t.Logf("  Total bytes generated: %d", stats.BytesGenerated)
+	t.Logf("  Total key rotations: %d", stats.KeyRotations)
+}
+
+// Test_PRNG_Stats_Concurrent verifies Stats() correctness under concurrent load
+// without relying on sleeps—uses WaitGroup to ensure all reads complete.
+func Test_PRNG_Stats_Concurrent(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	cfg := DefaultConfig()
+	cfg.MaxBytesPerKey = 128
+	cfg.EnableKeyRotation = false // Disable async rekey to avoid races
+	cfg.Shards = 8
+
+	r, err := NewReader(
+		WithMaxBytesPerKey(cfg.MaxBytesPerKey),
+		WithEnableKeyRotation(cfg.EnableKeyRotation),
+		WithShards(cfg.Shards),
+	)
+	is.NoError(err)
+
+	const (
+		numGoroutines   = 50
+		readsPerRoutine = 20
+		bufferSize      = 64
+	)
+
+	var wg sync.WaitGroup
+	wg.Add(numGoroutines)
+
+	for i := 0; i < numGoroutines; i++ {
+		go func() {
+			defer wg.Done()
+			buf := make([]byte, bufferSize)
+			for j := 0; j < readsPerRoutine; j++ {
+				_, _ = r.Read(buf)
+			}
+		}()
+	}
+
+	wg.Wait() // All reads guaranteed complete—no sleep needed
+
+	stats := r.(*reader).Stats()
+	expectedBytes := uint64(numGoroutines * readsPerRoutine * bufferSize)
+
+	is.Equal(expectedBytes, stats.BytesGenerated, "BytesGenerated should match total reads")
+	is.Equal(uint64(0), stats.KeyRotations, "KeyRotations should be 0 when disabled")
 }
