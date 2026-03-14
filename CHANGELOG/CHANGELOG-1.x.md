@@ -19,6 +19,19 @@ Date format: `YYYY-MM-DD`
 
 ---
 
+## [1.16.0] - 2026-03-14
+
+### Added
+### Changed
+- **debt:** Upgraded all dependencies to their latest stable versions, which includes `golang.org/x/crypto`.
+
+### Deprecated
+### Removed
+### Fixed
+### Security
+
+---
+
 ## [1.15.0] - 2026-02-12
 
 ### Added
@@ -267,7 +280,8 @@ Date format: `YYYY-MM-DD`
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.15.0...HEAD
+[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.16.0...HEAD
+[1.16.0]: https://github.com/sixafter/prng-chacha/compare/v1.15.0...v1.16.0
 [1.15.0]: https://github.com/sixafter/prng-chacha/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/sixafter/prng-chacha/compare/v1.13.0...v1.14.0
 [1.13.0]: https://github.com/sixafter/prng-chacha/compare/v1.12.0...v1.13.0
