@@ -12,6 +12,8 @@ Date format: `YYYY-MM-DD`
 
 ### Added
 ### Changed
+- **debt:** Upgraded [Cosign](https://github.com/sigstore/cosign-installer) to latest stable version.
+
 ### Deprecated
 ### Removed
 ### Fixed
