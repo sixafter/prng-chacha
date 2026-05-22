@@ -12,6 +12,18 @@ Date format: `YYYY-MM-DD`
 
 ### Added
 ### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+
+---
+
+## [1.16.3] - 2026-05-08
+
+### Added
+### Changed
+- **debt:** Upgraded all dependencies to their latest stable versions.
 - **debt:** Upgraded [Cosign](https://github.com/sigstore/cosign-installer) to latest stable version.
 
 ### Deprecated
@@ -308,7 +320,8 @@ Date format: `YYYY-MM-DD`
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.16.2...HEAD
+[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.16.3...HEAD
+[1.16.3]: https://github.com/sixafter/prng-chacha/compare/v1.16.2...v1.16.3
 [1.16.2]: https://github.com/sixafter/prng-chacha/compare/v1.16.1...v1.16.2
 [1.16.1]: https://github.com/sixafter/prng-chacha/compare/v1.16.0...v1.16.1
 [1.16.0]: https://github.com/sixafter/prng-chacha/compare/v1.15.0...v1.16.0
