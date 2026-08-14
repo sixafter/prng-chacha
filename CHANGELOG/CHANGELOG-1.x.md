@@ -19,6 +19,18 @@ Date format: `YYYY-MM-DD`
 
 ---
 
+## [1.16.6] - 2026-08-13
+
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+- **debt:** Upgraded all dependencies to their latest stable versions.
+
+---
+
 ## [1.16.5] - 2026-07-12
 
 ### Added
@@ -345,7 +357,8 @@ Date format: `YYYY-MM-DD`
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.16.5...HEAD
+[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.16.6...HEAD
+[1.16.6]: https://github.com/sixafter/prng-chacha/compare/v1.16.5...v1.16.6
 [1.16.5]: https://github.com/sixafter/prng-chacha/compare/v1.16.4...v1.16.5
 [1.16.4]: https://github.com/sixafter/prng-chacha/compare/v1.16.3...v1.16.4
 [1.16.3]: https://github.com/sixafter/prng-chacha/compare/v1.16.2...v1.16.3
