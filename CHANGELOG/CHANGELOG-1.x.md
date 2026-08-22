@@ -19,15 +19,30 @@ Date format: `YYYY-MM-DD`
 
 ---
 
-## [1.16.6] - 2026-08-13
+## [1.17.0] - 2026-08-22
 
 ### Added
 ### Changed
+- **debt:** Upgraded to [Go 1.27](https://go.dev/doc/go1.27).
+- **debt:** Upgraded dependencies to their latest stable versions.
+
 ### Deprecated
 ### Removed
 ### Fixed
 ### Security
+
+---
+
+## [1.16.6] - 2026-08-13
+
+### Added
+### Changed
 - **debt:** Upgraded all dependencies to their latest stable versions.
+
+### Deprecated
+### Removed
+### Fixed
+### Security
 
 ---
 
@@ -357,7 +372,8 @@ Date format: `YYYY-MM-DD`
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.16.6...HEAD
+[Unreleased]: https://github.com/sixafter/prng-chacha/compare/v1.17.0...HEAD
+[1.17.0]: https://github.com/sixafter/prng-chacha/compare/v1.16.6...v1.17.0
 [1.16.6]: https://github.com/sixafter/prng-chacha/compare/v1.16.5...v1.16.6
 [1.16.5]: https://github.com/sixafter/prng-chacha/compare/v1.16.4...v1.16.5
 [1.16.4]: https://github.com/sixafter/prng-chacha/compare/v1.16.3...v1.16.4
